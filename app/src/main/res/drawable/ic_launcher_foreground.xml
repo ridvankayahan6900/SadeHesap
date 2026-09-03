@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- "=" işareti: iki yatay yuvarlatılmış (hap biçimli) çubuk -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,42 L72,42 A4,4 0 0 1 76,46 A4,4 0 0 1 72,50 L36,50 A4,4 0 0 1 32,46 A4,4 0 0 1 36,42 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,58 L72,58 A4,4 0 0 1 76,62 A4,4 0 0 1 72,66 L36,66 A4,4 0 0 1 32,62 A4,4 0 0 1 36,58 Z" />
+    <!-- Sağ üstte küçük "+" -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M71,30.75 L81,30.75 L81,33.25 L71,33.25 Z M74.75,27 L77.25,27 L77.25,37 L74.75,37 Z" />
+</vector>

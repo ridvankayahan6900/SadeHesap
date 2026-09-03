@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sade Hesap</string>
+
+    <!-- Rakam tuşu etiketleri (0-9), tüm dillerde aynı Batı Arap rakamları -->
+    <string name="btn_digit_0">0</string>
+    <string name="btn_digit_1">1</string>
+    <string name="btn_digit_2">2</string>
+    <string name="btn_digit_3">3</string>
+    <string name="btn_digit_4">4</string>
+    <string name="btn_digit_5">5</string>
+    <string name="btn_digit_6">6</string>
+    <string name="btn_digit_7">7</string>
+    <string name="btn_digit_8">8</string>
+    <string name="btn_digit_9">9</string>
+
+    <!-- İşlem tuşu etiketleri -->
+    <string name="btn_decimal">,</string>
+    <string name="btn_add">+</string>
+    <string name="btn_subtract">−</string>
+    <string name="btn_multiply">×</string>
+    <string name="btn_divide">÷</string>
+    <string name="btn_percent">%</string>
+    <string name="btn_plus_minus">±</string>
+    <string name="btn_clear">AC</string>
+    <string name="btn_backspace">⌫</string>
+    <string name="btn_equals">=</string>
+
+    <!-- Erişilebilirlik açıklamaları -->
+    <string name="cd_digit">%1$s rakamı</string>
+    <string name="cd_decimal">Ondalık ayırıcı</string>
+    <string name="cd_add">Topla</string>
+    <string name="cd_subtract">Çıkar</string>
+    <string name="cd_multiply">Çarp</string>
+    <string name="cd_divide">Böl</string>
+    <string name="cd_percent">Yüzde</string>
+    <string name="cd_plus_minus">İşareti değiştir, artı veya eksi</string>
+    <string name="cd_clear">Tümünü temizle</string>
+    <string name="cd_backspace">Geri sil</string>
+    <string name="cd_equals">Eşittir, sonucu hesapla</string>
+    <string name="cd_expression">Girilen ifade</string>
+    <string name="cd_result">Sonuç</string>
+    <string name="cd_history_panel">Geçmiş hesaplar listesi</string>
+    <string name="cd_history_item">%1$s eşittir %2$s. Dokunarak sonucu ifadeye al.</string>
+
+    <string name="label_history_title">Geçmiş</string>
+    <string name="label_history_empty">Henüz hesap yapılmadı</string>
+    <string name="error_result">Hata</string>
+    <string name="msg_copied">Sonuç panoya kopyalandı</string>
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Calcul Simple</string>
+
+    <string name="btn_decimal">,</string>
+    <string name="btn_add">+</string>
+    <string name="btn_subtract">−</string>
+    <string name="btn_multiply">×</string>
+    <string name="btn_divide">÷</string>
+    <string name="btn_percent">%</string>
+    <string name="btn_plus_minus">±</string>
+    <string name="btn_clear">AC</string>
+    <string name="btn_backspace">⌫</string>
+    <string name="btn_equals">=</string>
+
+    <string name="cd_digit">Chiffre %1$s</string>
+    <string name="cd_decimal">Séparateur décimal</string>
+    <string name="cd_add">Additionner</string>
+    <string name="cd_subtract">Soustraire</string>
+    <string name="cd_multiply">Multiplier</string>
+    <string name="cd_divide">Diviser</string>
+    <string name="cd_percent">Pourcentage</string>
+    <string name="cd_plus_minus">Changer de signe, plus ou moins</string>
+    <string name="cd_clear">Tout effacer</string>
+    <string name="cd_backspace">Effacer le dernier caractère</string>
+    <string name="cd_equals">Égal, calculer le résultat</string>
+    <string name="cd_expression">Expression saisie</string>
+    <string name="cd_result">Résultat</string>
+    <string name="cd_history_panel">Liste de l\'historique des calculs</string>
+    <string name="cd_history_item">%1$s égale %2$s. Touchez pour réutiliser le résultat.</string>
+
+    <string name="label_history_title">Historique</string>
+    <string name="label_history_empty">Aucun calcul pour l\'instant</string>
+    <string name="error_result">Erreur</string>
+    <string name="msg_copied">Résultat copié dans le presse-papiers</string>
+</resources>

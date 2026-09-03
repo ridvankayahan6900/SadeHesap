@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple Calc</string>
+
+    <string name="btn_decimal">.</string>
+    <string name="btn_add">+</string>
+    <string name="btn_subtract">−</string>
+    <string name="btn_multiply">×</string>
+    <string name="btn_divide">÷</string>
+    <string name="btn_percent">%</string>
+    <string name="btn_plus_minus">±</string>
+    <string name="btn_clear">AC</string>
+    <string name="btn_backspace">⌫</string>
+    <string name="btn_equals">=</string>
+
+    <string name="cd_digit">Digit %1$s</string>
+    <string name="cd_decimal">Decimal separator</string>
+    <string name="cd_add">Add</string>
+    <string name="cd_subtract">Subtract</string>
+    <string name="cd_multiply">Multiply</string>
+    <string name="cd_divide">Divide</string>
+    <string name="cd_percent">Percent</string>
+    <string name="cd_plus_minus">Toggle sign, plus or minus</string>
+    <string name="cd_clear">Clear all</string>
+    <string name="cd_backspace">Backspace</string>
+    <string name="cd_equals">Equals, calculate result</string>
+    <string name="cd_expression">Entered expression</string>
+    <string name="cd_result">Result</string>
+    <string name="cd_history_panel">Calculation history list</string>
+    <string name="cd_history_item">%1$s equals %2$s. Tap to reuse the result.</string>
+
+    <string name="label_history_title">History</string>
+    <string name="label_history_empty">No calculations yet</string>
+    <string name="error_result">Error</string>
+    <string name="msg_copied">Result copied to clipboard</string>
+</resources>
