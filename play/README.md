@@ -57,3 +57,16 @@ https://ridvankayahan6900.github.io/SadeHesap/play/privacy.html
    sürüm yükle, en az 12 test kullanıcısı kesintisiz 14 gün opt-in kalsın, sonra
    "Üretime erişim için başvur". Daha eski ya da kurumsal hesapta bu adım yok.
 2. Dahili test → (kapalı test) → Üretim. Her sürümde `app/build/outputs/bundle/release/app-release.aab`.
+
+## Durum — 3 Eylül 2026 gece (Play Console, Pixelrift Studio)
+
+- Uygulama oluşturuldu: App ID `4975792809957831086`. Mağaza kaydı TR/EN/FR, tüm "Uygulama içeriği"
+  beyanları, kategori Tools, iletişim e-postası kaydedildi. 17 değişiklik tek pakette Google
+  incelemesinde ("In review").
+- **Dahili test**: sürüm 1 (1.0.0) canlı. Katılım: https://play.google.com/apps/internaltest/4701590146032132579
+- **Kapalı test (Alpha)**: sürüm 1 (1.0.0) incelemede, 177 ülke. Katılım:
+  https://play.google.com/apps/testing/com.ridvan.sadehesap
+- **Üretim**: "Apply for production" pasif — kapalı testte en az 12 test kullanıcısı 14 gün
+  kesintisiz kalmalı (şu an 0/12; liste "İç test" yalnız rdvankayahan@gmail.com).
+- Eksik/isteğe bağlı: mağaza etiketleri (Store settings → Manage tags) elle eklenebilir;
+  10 inç tablet görselleri boş.
