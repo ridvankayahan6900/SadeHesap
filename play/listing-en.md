@@ -36,3 +36,6 @@ calculator, simple calculator, sade hesap, math, percentage calculator, privacy-
 
 ## Contact email
 rdvankayahan@gmail.com
+
+## Gizlilik politikası URL / Privacy policy URL
+https://ridvankayahan6900.github.io/SadeHesap/play/privacy.html

@@ -39,3 +39,21 @@ alana karşılık geldiği listelenmiştir.
 - `privacy.html` harici hiçbir kaynak (font, script, CDN) çağırmaz; tek dosya olarak
   taşınabilir ve herhangi bir statik barındırmada çalışır.
 - Karakter sınırları (`≤30`, `≤80`, `≤4000`, `≤500`) her dilde ayrıca doğrulandı.
+
+## Görsel varlıklar (bu klasörde)
+
+| Dosya | Play Console alanı | Şart |
+|---|---|---|
+| `icon-512.png` | Mağaza kaydı → Uygulama simgesi | 512×512, 32-bit PNG (alfa) |
+| `feature-1024x500.png` | Mağaza kaydı → Öne çıkan görsel | 1024×500, 24-bit PNG |
+| `screenshot-1.png` … `screenshot-3.png` | Mağaza kaydı → Telefon ekran görüntüleri (aynıları 7" tablet sekmesine de yüklenebilir) | 1200×1920, oran 10:16 |
+
+Gizlilik politikası (Uygulama içeriği → Gizlilik politikası ve Veri güvenliği formu):
+https://ridvankayahan6900.github.io/SadeHesap/play/privacy.html
+
+## Yayın yolu (2026)
+
+1. Hesap 13 Kasım 2023'ten SONRA açılmış kişisel hesapsa: önce **Kapalı test** kanalına
+   sürüm yükle, en az 12 test kullanıcısı kesintisiz 14 gün opt-in kalsın, sonra
+   "Üretime erişim için başvur". Daha eski ya da kurumsal hesapta bu adım yok.
+2. Dahili test → (kapalı test) → Üretim. Her sürümde `app/build/outputs/bundle/release/app-release.aab`.

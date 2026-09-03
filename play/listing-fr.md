@@ -36,3 +36,6 @@ calculatrice, calculatrice simple, sade hesap, mathématiques, calcul de pourcen
 
 ## E-mail de contact
 rdvankayahan@gmail.com
+
+## Gizlilik politikası URL / Privacy policy URL
+https://ridvankayahan6900.github.io/SadeHesap/play/privacy.html

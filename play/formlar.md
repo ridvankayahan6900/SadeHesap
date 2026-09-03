@@ -89,3 +89,6 @@ Play Console'da zorunlu bir form olmasa da mağaza sayfası incelemesinde faydal
 uygulama her tuş için `contentDescription` sağlar, minimum 48dp dokunma hedefi
 kullanır ve ifade/sonuç alanları için semantics tanımlıdır — bu nedenle
 "erişilebilirlik özellikleri içerir" notu eklenebilir.
+
+## Gizlilik politikası URL / Privacy policy URL
+https://ridvankayahan6900.github.io/SadeHesap/play/privacy.html

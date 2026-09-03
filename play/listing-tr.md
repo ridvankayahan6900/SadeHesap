@@ -36,3 +36,6 @@ hesap makinesi, sade hesap makinesi, basit hesap makinesi, calculator, matematik
 
 ## İletişim e-postası
 rdvankayahan@gmail.com
+
+## Gizlilik politikası URL / Privacy policy URL
+https://ridvankayahan6900.github.io/SadeHesap/play/privacy.html
