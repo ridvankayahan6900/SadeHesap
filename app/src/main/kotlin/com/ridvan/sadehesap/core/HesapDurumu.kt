@@ -32,7 +32,15 @@ data class HesapDurumu(
     val sonSonuc: String? = null,
     val hataVarMi: Boolean = false,
     val esittirSonrasi: Boolean = false,
-    val gecmis: List<GecmisKaydi> = emptyList()
+    val gecmis: List<GecmisKaydi> = emptyList(),
+    // Yalnizca esittirSonrasi=true iken anlamlidir: sonSonuc, Degerlendirici.sadeMetne'nin
+    // GOSTERIM_BASAMAK sinirindan dolayi yuvarlanmasindan mi geldi (gercek/yaklasik ayrimi
+    // icin UI'ya bilgi tasir). Son parametre olarak eklendi ki mevcut pozisyonel
+    // constructor cagrilari (bkz. HesapEkrani.kt HesapDurumuSaver.restore) etkilenmesin;
+    // bu yuzden rememberSaveable serilestirmesine dahil edilmedi — surec olumunden
+    // (process death) sonra geri yuklenince bu bayrak varsayilan false'a doner (bilincli
+    // kucuk kisitlama, bkz. inceleme notlari).
+    val sonucYuvarlandiMi: Boolean = false
 ) {
     companion object {
         const val MAKS_GECMIS = 20
@@ -94,7 +102,12 @@ private fun HesapDurumu.operatorGir(op: String): HesapDurumu {
     if (hataVarMi) return this
     if (esittirSonrasi) {
         val baslangic = sonSonuc ?: "0"
-        return copy(tokenlar = listOf(baslangic, op), sonSonuc = null, esittirSonrasi = false)
+        return copy(
+            tokenlar = listOf(baslangic, op),
+            sonSonuc = null,
+            esittirSonrasi = false,
+            sonucYuvarlandiMi = false
+        )
     }
     val son = tokenlar.last()
     return if (isOperator(son)) {
@@ -110,7 +123,7 @@ private fun HesapDurumu.yuzdeUygula(): HesapDurumu {
     if (esittirSonrasi) {
         val deger = sonSonuc?.let { ham -> runCatching { BigDecimal(ham) }.getOrNull() } ?: return this
         val yeni = Degerlendirici.sadeMetne(deger.divide(BigDecimal(100), MathContext(20)))
-        return copy(tokenlar = listOf(yeni), sonSonuc = null, esittirSonrasi = false)
+        return copy(tokenlar = listOf(yeni), sonSonuc = null, esittirSonrasi = false, sonucYuvarlandiMi = false)
     }
     val son = tokenlar.last()
     if (isOperator(son)) return this
@@ -129,7 +142,7 @@ private fun HesapDurumu.artiEksiUygula(): HesapDurumu {
             deger == "0" -> "0"
             else -> "-$deger"
         }
-        return copy(tokenlar = listOf(yeni), sonSonuc = null, esittirSonrasi = false)
+        return copy(tokenlar = listOf(yeni), sonSonuc = null, esittirSonrasi = false, sonucYuvarlandiMi = false)
     }
     val son = tokenlar.last()
     if (isOperator(son) || son == "0" || son == "0.") return this
@@ -143,7 +156,7 @@ private fun HesapDurumu.geriSil(): HesapDurumu {
         val deger = sonSonuc ?: "0"
         val kisaltilmis = deger.dropLast(1)
         val yeni = if (kisaltilmis.isEmpty() || kisaltilmis == "-") "0" else kisaltilmis
-        return copy(tokenlar = listOf(yeni), sonSonuc = null, esittirSonrasi = false)
+        return copy(tokenlar = listOf(yeni), sonSonuc = null, esittirSonrasi = false, sonucYuvarlandiMi = false)
     }
     val son = tokenlar.last()
     if (isOperator(son)) {
@@ -163,6 +176,11 @@ private fun HesapDurumu.geriSil(): HesapDurumu {
 
 private fun HesapDurumu.esitle(): HesapDurumu {
     if (hataVarMi) return this
+    // Sonuc zaten tek token'a inmisken ("=" bir kere basilip sonuca ulasilmisken) tekrar
+    // "=" basmak no-op olmali: aksi halde Degerlendirici.degerlendir tek elemanli listeyle
+    // tekrar cagrilir ve gecmise ifade=sonuc, sonuc=sonuc seklinde anlamsiz bir yinelenen
+    // kayit eklenirdi (bkz. inceleme bulgusu).
+    if (esittirSonrasi) return this
     val son = tokenlar.last()
     if (isOperator(son)) return this // eksik ifade, yok say
     return when (val sonucu = Degerlendirici.degerlendir(tokenlar)) {
@@ -176,7 +194,8 @@ private fun HesapDurumu.esitle(): HesapDurumu {
                 tokenlar = listOf(sonucMetni),
                 sonSonuc = sonucMetni,
                 esittirSonrasi = true,
-                gecmis = yeniGecmis
+                gecmis = yeniGecmis,
+                sonucYuvarlandiMi = Degerlendirici.yuvarlandiMi(sonucu.deger)
             )
         }
     }

@@ -2,6 +2,7 @@ package com.ridvan.sadehesap.core
 
 import java.math.BigDecimal
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -97,5 +98,28 @@ class DegerlendiriciTest {
         // 10 - 3 + 2 = 9 (10 - (3+2)=5 degil)
         val deger = basarili(listOf("10", "−", "3", "+", "2"))
         assertEquals("9", Degerlendirici.sadeMetne(deger))
+    }
+
+    // --- yuvarlandiMi: sadeMetne'nin GOSTERIM_BASAMAK=12 sinirindan dolayi bir degeri
+    // yuvarlayip yuvarlamadigini UI'ya bildiren ayri bayrak (inceleme bulgusu: sessiz
+    // yuvarlama kullaniciya hicbir isaretle gosterilmiyordu). ---
+    @Test
+    fun `12 basamaktan az sonuclarda yuvarlandiMi false doner`() {
+        val deger = basarili(listOf("2", "+", "3"))
+        assertEquals("5", Degerlendirici.sadeMetne(deger))
+        assertFalse(Degerlendirici.yuvarlandiMi(deger))
+    }
+
+    @Test
+    fun `12 basamaktan fazla sonuclarda yuvarlandiMi true doner`() {
+        // 1 / 3, 20 basamak hassasiyetle 0.333...3 (12'den fazla anlamli basamak) doner.
+        val deger = basarili(listOf("1", "÷", "3"))
+        assertTrue(Degerlendirici.yuvarlandiMi(deger))
+    }
+
+    @Test
+    fun `sifir yuvarlandiMi icin her zaman false doner`() {
+        assertFalse(Degerlendirici.yuvarlandiMi(BigDecimal.ZERO))
+        assertFalse(Degerlendirici.yuvarlandiMi(BigDecimal("0.00")))
     }
 }

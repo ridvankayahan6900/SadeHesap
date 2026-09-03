@@ -102,4 +102,14 @@ object Degerlendirici {
         val duzMetin = sadelesmis.toPlainString()
         return if (duzMetin == "-0") "0" else duzMetin
     }
+
+    /**
+     * [deger], [sadeMetne] ile metne çevrilirken GOSTERIM_BASAMAK basamağından fazla anlamlı
+     * basamağının kırpılıp kırpıldığını (yani gösterilen metnin gerçek değerin YAKLAŞIK bir
+     * temsili olup olmadığını) bildirir — UI'nın kullanıcıya bir yuvarlama işareti (örn. "≈")
+     * gösterebilmesi içindir. [sadeMetne]'nin kendi dönüş tipini değiştirmez: o metin hâlâ
+     * ham/ayrıştırılabilir sayı olarak tokenlar içinde saklanıp tekrar hesaplara girer.
+     */
+    fun yuvarlandiMi(deger: BigDecimal): Boolean =
+        deger.compareTo(BigDecimal.ZERO) != 0 && deger.precision() > GOSTERIM_BASAMAK
 }

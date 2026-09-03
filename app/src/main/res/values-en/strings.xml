@@ -2,6 +2,18 @@
 <resources>
     <string name="app_name">Simple Calc</string>
 
+    <!-- Digit key labels (0-9), same Western Arabic numerals in every language -->
+    <string name="btn_digit_0">0</string>
+    <string name="btn_digit_1">1</string>
+    <string name="btn_digit_2">2</string>
+    <string name="btn_digit_3">3</string>
+    <string name="btn_digit_4">4</string>
+    <string name="btn_digit_5">5</string>
+    <string name="btn_digit_6">6</string>
+    <string name="btn_digit_7">7</string>
+    <string name="btn_digit_8">8</string>
+    <string name="btn_digit_9">9</string>
+
     <string name="btn_decimal">.</string>
     <string name="btn_add">+</string>
     <string name="btn_subtract">−</string>
@@ -28,6 +40,9 @@
     <string name="cd_result">Result</string>
     <string name="cd_history_panel">Calculation history list</string>
     <string name="cd_history_item">%1$s equals %2$s. Tap to reuse the result.</string>
+
+    <string name="label_rounded_prefix">≈ </string>
+    <string name="cd_rounded_suffix">, approximate value (rounded beyond 12 digits)</string>
 
     <string name="label_history_title">History</string>
     <string name="label_history_empty">No calculations yet</string>

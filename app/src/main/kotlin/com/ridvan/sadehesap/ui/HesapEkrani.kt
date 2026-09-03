@@ -1,6 +1,7 @@
 package com.ridvan.sadehesap.ui
 
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,14 +43,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -127,6 +127,10 @@ fun HesapEkrani(modifier: Modifier = Modifier) {
         else -> tamIfade
     }
 
+    // Yalnizca "=" sonrasi gosterilen sonuc icin anlamli: Degerlendirici.sadeMetne'nin
+    // GOSTERIM_BASAMAK sinirindan dolayi bu deger yuvarlanmis/yaklasik mi?
+    val sonucYuvarlandiMi = durum.esittirSonrasi && durum.sonucYuvarlandiMi
+
     val ustSatir = if (durum.esittirSonrasi) {
         durum.gecmis.firstOrNull { it.sonuc == durum.sonSonuc }
             ?.let { kayit -> gosterMetni(kayit.ifade) + " =" }
@@ -169,6 +173,7 @@ fun HesapEkrani(modifier: Modifier = Modifier) {
                 HesapGovde(
                     ustSatir = ustSatir,
                     anaGosterim = anaGosterim,
+                    sonucYuvarlandiMi = sonucYuvarlandiMi,
                     onUzunBasKopyala = ::sonucuKopyala,
                     onTus = { durum = durum.uygula(it) },
                     modifier = Modifier
@@ -194,6 +199,7 @@ fun HesapEkrani(modifier: Modifier = Modifier) {
                 HesapGovde(
                     ustSatir = ustSatir,
                     anaGosterim = anaGosterim,
+                    sonucYuvarlandiMi = sonucYuvarlandiMi,
                     onUzunBasKopyala = ::sonucuKopyala,
                     onTus = { durum = durum.uygula(it) },
                     modifier = Modifier
@@ -209,6 +215,7 @@ fun HesapEkrani(modifier: Modifier = Modifier) {
 private fun HesapGovde(
     ustSatir: String,
     anaGosterim: String,
+    sonucYuvarlandiMi: Boolean,
     onUzunBasKopyala: () -> Unit,
     onTus: (HesapTusu) -> Unit,
     modifier: Modifier = Modifier
@@ -217,6 +224,7 @@ private fun HesapGovde(
         EkranAlani(
             ustSatir = ustSatir,
             anaGosterim = anaGosterim,
+            sonucYuvarlandiMi = sonucYuvarlandiMi,
             onUzunBasKopyala = onUzunBasKopyala,
             modifier = Modifier
                 .fillMaxWidth()
@@ -235,11 +243,24 @@ private fun HesapGovde(
 private fun EkranAlani(
     ustSatir: String,
     anaGosterim: String,
+    sonucYuvarlandiMi: Boolean,
     onUzunBasKopyala: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val ifadeAciklama = stringResource(R.string.cd_expression)
     val sonucAciklama = stringResource(R.string.cd_result)
+    val yuvarlandiOneki = stringResource(R.string.label_rounded_prefix)
+    val yuvarlandiAciklamaEki = stringResource(R.string.cd_rounded_suffix)
+
+    // "≈" öneki yalnizca gorsel etiket icin: kopyalanan/hesaba devam eden gercek deger
+    // (kopyalanacakDeger, durum.sonSonuc) bu metinden degil dogrudan HesapDurumu'ndan
+    // gelir, bu yuzden onek onlari etkilemez.
+    val anaGosterimMetni = if (sonucYuvarlandiMi) "$yuvarlandiOneki$anaGosterim" else anaGosterim
+    val sonucAciklamaMetni = if (sonucYuvarlandiMi) {
+        "$sonucAciklama: $anaGosterim$yuvarlandiAciklamaEki"
+    } else {
+        "$sonucAciklama: $anaGosterim"
+    }
 
     Column(
         modifier = modifier
@@ -248,14 +269,19 @@ private fun EkranAlani(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End
     ) {
+        // Tek satir + yatay kaydirma (reverseScrolling=true): ifade kisa ise sag kenara
+        // yasli gorunur (bir kaydirma cubugu gerekmez); uzunsa varsayilan olarak SONU
+        // (en son basilan "=" ve ona en yakin basamaklar) gorunur, kullanici sola kaydirip
+        // basini gorebilir. maxLines/Ellipsis ile hicbir basamak sessizce kirpilmaz.
         Text(
             text = ustSatir,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            softWrap = false,
             modifier = Modifier
                 .fillMaxWidth()
+                .horizontalScroll(rememberScrollState(), reverseScrolling = true)
                 .semantics { contentDescription = "$ifadeAciklama: $ustSatir" }
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -269,20 +295,24 @@ private fun EkranAlani(
                     onLongClick = onUzunBasKopyala
                 )
                 .semantics(mergeDescendants = true) {
-                    contentDescription = "$sonucAciklama: $anaGosterim"
+                    contentDescription = sonucAciklamaMetni
                     liveRegion = LiveRegionMode.Polite
                 }
                 .padding(vertical = 12.dp)
         ) {
+            // Ana sonuc: ayni tek-satir + yatay kaydirma korumasi (bkz. yukaridaki not) —
+            // önceki sabit 40sp + Ellipsis kombinasyonu cok uzun sonuclarda anlamli son
+            // basamaklari gorunmez kiliyordu (inceleme bulgusu), artik hicbiri kaybolmuyor.
             Text(
-                text = anaGosterim,
+                text = anaGosterimMetni,
                 style = MaterialTheme.typography.displaySmall,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.End,
-                modifier = Modifier.fillMaxWidth()
+                softWrap = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState(), reverseScrolling = true)
             )
         }
     }
@@ -344,7 +374,11 @@ private fun GecmisSatiri(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 3.dp)
-            .clearAndSetSemantics {
+            // clearAndSetSemantics DEGIL: o, Surface'in kendi onClick'inin ekledigi
+            // ACTION_CLICK/tiklanabilirlik semantigini SILERDI (inceleme bulgusu — TalkBack
+            // ile bu satir etkinlestirilemez hale geliyordu). semantics(mergeDescendants)
+            // yerine mevcut semantigin UZERINE birlesir, tiklama eylemi korunur.
+            .semantics(mergeDescendants = true) {
                 contentDescription = satirAciklama
                 role = Role.Button
             },
@@ -405,15 +439,24 @@ private fun TusTakimi(onTus: (HesapTusu) -> Unit, modifier: Modifier = Modifier)
             ) { onTus(HesapTusu.Bol) }
         }
         TusSatiri(Modifier.weight(1f)) {
-            HesapTusButonu("7", stringResource(R.string.cd_digit, "7"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('7'))
-            }
-            HesapTusButonu("8", stringResource(R.string.cd_digit, "8"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('8'))
-            }
-            HesapTusButonu("9", stringResource(R.string.cd_digit, "9"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('9'))
-            }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_7),
+                stringResource(R.string.cd_digit, "7"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('7')) }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_8),
+                stringResource(R.string.cd_digit, "8"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('8')) }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_9),
+                stringResource(R.string.cd_digit, "9"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('9')) }
             HesapTusButonu(
                 stringResource(R.string.btn_multiply),
                 stringResource(R.string.cd_multiply),
@@ -422,15 +465,24 @@ private fun TusTakimi(onTus: (HesapTusu) -> Unit, modifier: Modifier = Modifier)
             ) { onTus(HesapTusu.Carp) }
         }
         TusSatiri(Modifier.weight(1f)) {
-            HesapTusButonu("4", stringResource(R.string.cd_digit, "4"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('4'))
-            }
-            HesapTusButonu("5", stringResource(R.string.cd_digit, "5"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('5'))
-            }
-            HesapTusButonu("6", stringResource(R.string.cd_digit, "6"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('6'))
-            }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_4),
+                stringResource(R.string.cd_digit, "4"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('4')) }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_5),
+                stringResource(R.string.cd_digit, "5"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('5')) }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_6),
+                stringResource(R.string.cd_digit, "6"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('6')) }
             HesapTusButonu(
                 stringResource(R.string.btn_subtract),
                 stringResource(R.string.cd_subtract),
@@ -439,15 +491,24 @@ private fun TusTakimi(onTus: (HesapTusu) -> Unit, modifier: Modifier = Modifier)
             ) { onTus(HesapTusu.Cikar) }
         }
         TusSatiri(Modifier.weight(1f)) {
-            HesapTusButonu("1", stringResource(R.string.cd_digit, "1"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('1'))
-            }
-            HesapTusButonu("2", stringResource(R.string.cd_digit, "2"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('2'))
-            }
-            HesapTusButonu("3", stringResource(R.string.cd_digit, "3"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('3'))
-            }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_1),
+                stringResource(R.string.cd_digit, "1"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('1')) }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_2),
+                stringResource(R.string.cd_digit, "2"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('2')) }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_3),
+                stringResource(R.string.cd_digit, "3"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('3')) }
             HesapTusButonu(
                 stringResource(R.string.btn_add),
                 stringResource(R.string.cd_add),
@@ -462,9 +523,12 @@ private fun TusTakimi(onTus: (HesapTusu) -> Unit, modifier: Modifier = Modifier)
                 TusRenk.IKINCIL,
                 Modifier.weight(1f)
             ) { onTus(HesapTusu.ArtiEksi) }
-            HesapTusButonu("0", stringResource(R.string.cd_digit, "0"), TusRenk.RAKAM, Modifier.weight(1f)) {
-                onTus(HesapTusu.Rakam('0'))
-            }
+            HesapTusButonu(
+                stringResource(R.string.btn_digit_0),
+                stringResource(R.string.cd_digit, "0"),
+                TusRenk.RAKAM,
+                Modifier.weight(1f)
+            ) { onTus(HesapTusu.Rakam('0')) }
             HesapTusButonu(
                 stringResource(R.string.btn_decimal),
                 stringResource(R.string.cd_decimal),
@@ -511,7 +575,9 @@ private fun HesapTusButonu(
         modifier = modifier
             .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
             .fillMaxHeight()
-            .clearAndSetSemantics {
+            // clearAndSetSemantics DEGIL (bkz. GecmisSatiri'ndeki ayni not) — Surface'in
+            // tiklanabilirlik eylemini korumak icin semantics(mergeDescendants) kullanilir.
+            .semantics(mergeDescendants = true) {
                 contentDescription = aciklama
                 role = Role.Button
             },
