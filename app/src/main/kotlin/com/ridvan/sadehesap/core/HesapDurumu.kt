@@ -35,12 +35,14 @@ data class HesapDurumu(
     val gecmis: List<GecmisKaydi> = emptyList(),
     // Yalnizca esittirSonrasi=true iken anlamlidir: sonSonuc, Degerlendirici.sadeMetne'nin
     // GOSTERIM_BASAMAK sinirindan dolayi yuvarlanmasindan mi geldi (gercek/yaklasik ayrimi
-    // icin UI'ya bilgi tasir). Son parametre olarak eklendi ki mevcut pozisyonel
-    // constructor cagrilari (bkz. HesapEkrani.kt HesapDurumuSaver.restore) etkilenmesin;
-    // bu yuzden rememberSaveable serilestirmesine dahil edilmedi — surec olumunden
-    // (process death) sonra geri yuklenince bu bayrak varsayilan false'a doner (bilincli
-    // kucuk kisitlama, bkz. inceleme notlari).
-    val sonucYuvarlandiMi: Boolean = false
+    // icin UI'ya bilgi tasir). DurumKodlayici ile rememberSaveable serilestirmesine
+    // dahildir: ekran dondurmede de Activity yeniden olusturuldugu icin aksi halde "≈"
+    // isareti her dondurmede kayboluyordu.
+    val sonucYuvarlandiMi: Boolean = false,
+    // Yalnızca esittirSonrasi=true iken anlamlıdır: ekrandaki sonucu üreten ifade. Üst
+    // satır bunu gösterir; geçmişte aynı sonuca sahip birden fazla kayıt olabileceği için
+    // sonuçtan geriye arama yapmak yanlış ifadeyi gösterebiliyordu.
+    val sonIfade: String? = null
 ) {
     companion object {
         const val MAKS_GECMIS = 20
@@ -69,7 +71,8 @@ fun HesapDurumu.gecmistenYukle(kayit: GecmisKaydi): HesapDurumu = HesapDurumu(
     tokenlar = listOf(kayit.sonuc),
     sonSonuc = kayit.sonuc,
     esittirSonrasi = true,
-    gecmis = gecmis
+    gecmis = gecmis,
+    sonIfade = kayit.ifade
 )
 
 private fun HesapDurumu.rakamGir(hane: Char): HesapDurumu {
@@ -81,6 +84,9 @@ private fun HesapDurumu.rakamGir(hane: Char): HesapDurumu {
         copy(tokenlar = tokenlar + hane.toString())
     } else if (son == "0") {
         copy(tokenlar = tokenlar.dropLast(1) + hane.toString())
+    } else if (son == "-0") {
+        // "-0.5" geri silinerek "-0"a inince bastaki sifir yine yer degistirmeli ("-07" degil "-7").
+        copy(tokenlar = tokenlar.dropLast(1) + "-$hane")
     } else {
         copy(tokenlar = tokenlar.dropLast(1) + (son + hane))
     }
@@ -195,7 +201,8 @@ private fun HesapDurumu.esitle(): HesapDurumu {
                 sonSonuc = sonucMetni,
                 esittirSonrasi = true,
                 gecmis = yeniGecmis,
-                sonucYuvarlandiMi = Degerlendirici.yuvarlandiMi(sonucu.deger)
+                sonucYuvarlandiMi = Degerlendirici.yuvarlandiMi(sonucu.deger),
+                sonIfade = ifadeGosterim
             )
         }
     }

@@ -111,5 +111,8 @@ object Degerlendirici {
      * ham/ayrıştırılabilir sayı olarak tokenlar içinde saklanıp tekrar hesaplara girer.
      */
     fun yuvarlandiMi(deger: BigDecimal): Boolean =
-        deger.compareTo(BigDecimal.ZERO) != 0 && deger.precision() > GOSTERIM_BASAMAK
+        // precision() sondaki sıfırları da sayar (1e15 → 16, 1.0000000000000 → 14); bu
+        // sıfırlar yuvarlamada kaybolmaz, bu yüzden önce kırpılır.
+        deger.compareTo(BigDecimal.ZERO) != 0 &&
+            deger.stripTrailingZeros().precision() > GOSTERIM_BASAMAK
 }
