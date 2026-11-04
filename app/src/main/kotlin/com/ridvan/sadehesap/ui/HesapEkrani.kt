@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ridvan.sadehesap.R
+import com.ridvan.sadehesap.core.DurumKodlayici
 import com.ridvan.sadehesap.core.GecmisKaydi
 import com.ridvan.sadehesap.core.HesapDurumu
 import com.ridvan.sadehesap.core.HesapTusu
@@ -60,41 +61,10 @@ import com.ridvan.sadehesap.core.gecmistenYukle
 import com.ridvan.sadehesap.core.uygula
 import kotlinx.coroutines.launch
 
-// Kontrol karakterleri: kullanici girdisinde (rakam/operator/gecmis metni) hicbir zaman
-// olusmaz, bu yuzden ayirici olarak guvenlidir. Tek bir String'e kodlanir (Bundle'da
-// String her zaman guvenle saklanabilir).
-private const val TOKEN_AYIRICI = "" // tokenlar listesi icinde
-private const val KAYIT_AYIRICI = "" // gecmis kayitlari arasinda
-private const val KAYIT_ALAN_AYIRICI = "" // bir kaydin ifade/sonuc alanlari arasinda
-private const val BOS_ISARETI = "" // sonSonuc == null isareti
-private const val ALAN_AYIRICI = "" // 5 ust duzey alan arasinda
-
-/** [HesapDurumu]'nu rememberSaveable ile tek bir String'e kodlar (kalici depolama yok). */
+/** [HesapDurumu]'nu rememberSaveable ile tek bir String'e kodlar (kalıcı depolama yok). */
 private val HesapDurumuSaver: Saver<HesapDurumu, String> = Saver(
-    save = { durum ->
-        listOf(
-            durum.tokenlar.joinToString(TOKEN_AYIRICI),
-            durum.sonSonuc ?: BOS_ISARETI,
-            if (durum.hataVarMi) "1" else "0",
-            if (durum.esittirSonrasi) "1" else "0",
-            durum.gecmis.joinToString(KAYIT_AYIRICI) { "${it.ifade}$KAYIT_ALAN_AYIRICI${it.sonuc}" }
-        ).joinToString(ALAN_AYIRICI)
-    },
-    restore = { metin ->
-        val alanlar = metin.split(ALAN_AYIRICI)
-        val tokenlar = alanlar[0].split(TOKEN_AYIRICI).filter { it.isNotEmpty() }.ifEmpty { listOf("0") }
-        val sonSonuc = alanlar[1].takeIf { it != BOS_ISARETI }
-        val hataVarMi = alanlar[2] == "1"
-        val esittirSonrasi = alanlar[3] == "1"
-        val gecmis = alanlar[4].takeIf { it.isNotEmpty() }
-            ?.split(KAYIT_AYIRICI)
-            ?.mapNotNull { kayit ->
-                val parcalar = kayit.split(KAYIT_ALAN_AYIRICI)
-                if (parcalar.size == 2) GecmisKaydi(parcalar[0], parcalar[1]) else null
-            }
-            ?: emptyList()
-        HesapDurumu(tokenlar, sonSonuc, hataVarMi, esittirSonrasi, gecmis)
-    }
+    save = { durum -> DurumKodlayici.kodla(durum) },
+    restore = { metin -> DurumKodlayici.coz(metin) }
 )
 
 private fun tokenOperatorMu(tok: String) = tok == "+" || tok == "−" || tok == "×" || tok == "÷"
@@ -132,9 +102,7 @@ fun HesapEkrani(modifier: Modifier = Modifier) {
     val sonucYuvarlandiMi = durum.esittirSonrasi && durum.sonucYuvarlandiMi
 
     val ustSatir = if (durum.esittirSonrasi) {
-        durum.gecmis.firstOrNull { it.sonuc == durum.sonSonuc }
-            ?.let { kayit -> gosterMetni(kayit.ifade) + " =" }
-            ?: ""
+        durum.sonIfade?.let { ifade -> gosterMetni(ifade) + " =" } ?: ""
     } else {
         ""
     }
